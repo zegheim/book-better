@@ -9,7 +9,11 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "3.12.6"
 requests = "2.32.3"
+requests-toolbelt = "1.0.0"
+python-dotenv = "1.0.1"
 
+[tool.poetry.scripts]
+main = "book_better.main:main"
 
 [build-system]
 requires = ["poetry-core"]

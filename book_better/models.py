@@ -23,4 +23,3 @@ class ActivityCart:
     id: int
     amount: int
     source: str
-    credit: int

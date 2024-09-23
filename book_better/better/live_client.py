@@ -1,15 +1,40 @@
+from __future__ import annotations
+
 import datetime
 import functools
+import logging
+from collections.abc import Callable
+from typing import Concatenate
 
 import requests
 from requests_toolbelt.sessions import BaseUrlSession  # type: ignore
 
 from book_better.enums import BetterActivity, BetterVenue
+from book_better.logging import log_method_inputs_and_outputs
 from book_better.models import (
     ActivityCart,
     ActivitySlot,
     ActivityTime,
 )
+
+type _LiveBetterClientInstanceMethod[**P, R] = Callable[
+    Concatenate[LiveBetterClient, P], R
+]
+
+
+def _requires_authentication[**P, R](
+    func: _LiveBetterClientInstanceMethod[P, R],
+) -> _LiveBetterClientInstanceMethod[P, R]:
+    @functools.wraps(func)
+    def wrapper(self: LiveBetterClient, *args: P.args, **kwargs: P.kwargs) -> R:
+        if not self.authenticated:
+            logging.info(
+                "requires_authentication: client is not authenticated, will authenticate"
+            )
+            self.authenticate()
+        return func(self, *args, **kwargs)
+
+    return wrapper
 
 
 class LiveBetterClient:
@@ -27,17 +52,22 @@ class LiveBetterClient:
         )
         self.session.headers.update(self.HEADERS)
 
+    @property
+    @log_method_inputs_and_outputs
+    def authenticated(self) -> bool:
+        return bool(self.session.headers.get("Authorization"))
+
     @functools.cached_property
+    @_requires_authentication
+    @log_method_inputs_and_outputs
     def membership_user_id(self) -> int:
         response = self.session.get("auth/user")
         response.raise_for_status()
 
         return response.json()["data"]["membership_user"]["id"]
 
+    @log_method_inputs_and_outputs
     def authenticate(self) -> None:
-        if self.session.headers.get("Authorization"):
-            return
-
         auth_response = self.session.post(
             "auth/customer/login",
             json=dict(username=self.username, password=self.password),
@@ -47,6 +77,8 @@ class LiveBetterClient:
         token: str = auth_response.json()["token"]
         self.session.headers.update({"Authorization": f"Bearer {token}"})
 
+    @_requires_authentication
+    @log_method_inputs_and_outputs
     def get_available_slots_for(
         self,
         venue: BetterVenue,
@@ -65,7 +97,7 @@ class LiveBetterClient:
         )
         response.raise_for_status()
 
-        return [
+        available_slots = [
             ActivitySlot(
                 id=slot["id"],
                 location_id=slot["location"]["id"],
@@ -75,9 +107,17 @@ class LiveBetterClient:
                 cart_type=slot["cart_type"],
             )
             for slot in response.json()["data"]
-            if slot["spaces"] > 0 and slot["booking"] is None
+            if slot["spaces"] > 0
+            and slot["booking"] is None
+            and slot["benefit_available"] is not None
         ]
+        if not available_slots:
+            logging.warning("No available slots found")
 
+        return available_slots
+
+    @_requires_authentication
+    @log_method_inputs_and_outputs
     def get_available_times_for(
         self, venue: BetterVenue, activity: BetterActivity, activity_date: datetime.date
     ) -> list[ActivityTime]:
@@ -87,7 +127,7 @@ class LiveBetterClient:
         )
         response.raise_for_status()
 
-        return [
+        available_times = [
             ActivityTime(
                 start=datetime.datetime.strptime(
                     time_["starts_at"]["format_24_hour"], "%H:%M"
@@ -99,7 +139,13 @@ class LiveBetterClient:
             for time_ in response.json()["data"]
             if time_["spaces"] > 0 and time_["booking"] is None
         ]
+        if not available_times:
+            logging.warning("No available times found")
 
+        return available_times
+
+    @_requires_authentication
+    @log_method_inputs_and_outputs
     def add_to_cart(self, slot: ActivitySlot) -> ActivityCart:
         response = self.session.post(
             "activities/cart/add",
@@ -125,33 +171,16 @@ class LiveBetterClient:
             id=data["id"],
             amount=data["total"],
             source=data["source"],
-            credit=data["credits"]["general"]["max_applicable"],
         )
 
-    def checkout_with_credit(self, cart: ActivityCart) -> int:
-        assert cart.amount <= cart.credit
-
-        apply_credit_response = self.session.post(
-            "credits/apply",
-            json=dict(
-                credits_to_reserve=[dict(amount=cart.credit, type="general")],
-                cart_source=cart.source,
-                selected_user_id=None,
-            ),
-        )
-        apply_credit_response.raise_for_status()
-
+    @_requires_authentication
+    @log_method_inputs_and_outputs
+    def checkout_with_benefit(self, cart: ActivityCart) -> int:
         complete_checkout_response = self.session.post(
             "checkout/complete",
             json=dict(
                 completed_waivers=[],
-                payments=[
-                    dict(
-                        tender_type="credit",
-                        amount=apply_credit_response.json()["amount"],
-                        info={},
-                    )
-                ],
+                payments=[],
                 selected_user_id=None,
                 source=cart.source,
                 terms=[1],

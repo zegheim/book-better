@@ -1,25 +1,40 @@
 import datetime
 import logging
 import os
-from typing import Any
+from typing import Any, Literal, TypedDict
 
 from book_better.better.live_client import LiveBetterClient
 from book_better.enums import BetterActivity, BetterVenue
 from book_better.utils import parse_time
 
 
-def lambda_handler(event: Any, context: Any) -> int | None:
+class LambdaResponse(TypedDict):
+    status: Literal["success", "error"]
+    message: str
+
+
+def lambda_handler(event: Any, context: Any) -> LambdaResponse:
     client = LiveBetterClient(
         username=os.environ["BETTER_USERNAME"], password=os.environ["BETTER_PASSWORD"]
     )
+    activity_date = datetime.date.today() + datetime.timedelta(days=7)
 
     available_slots = client.get_available_slots_for(
         venue=BetterVenue(os.environ["BETTER_VENUE_SLUG"]),
         activity=BetterActivity(os.environ["BETTER_ACTIVITY_SLUG"]),
-        activity_date=datetime.date.today() + datetime.timedelta(days=7),
+        activity_date=activity_date,
         start_time=parse_time(os.environ["BETTER_ACTIVITY_START_TIME"]),
         end_time=parse_time(os.environ["BETTER_ACTIVITY_END_TIME"]),
     )
+    if not available_slots:
+        logging.error(
+            "Could not find any available slot",
+            extra=dict(available_slots=available_slots),
+        )
+        return {
+            "status": "error",
+            "message": f"Could not find any available slot on {activity_date.strftime('%Y-%m-%d')}.",
+        }
 
     order_id: int | None = None
     for slot in available_slots:
@@ -41,5 +56,12 @@ def lambda_handler(event: Any, context: Any) -> int | None:
             "Could not book any slot",
             extra=dict(available_slots=available_slots),
         )
+        return {
+            "status": "error",
+            "message": f"Could not book any slot on {activity_date.strftime('%Y-%m-%d')}.",
+        }
 
-    return order_id
+    return {
+        "status": "success",
+        "message": f"Successfully booked order {order_id}.",
+    }

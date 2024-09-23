@@ -27,6 +27,12 @@ def main():
         start_time=parse_time(os.environ["BETTER_ACTIVITY_START_TIME"]),
         end_time=parse_time(os.environ["BETTER_ACTIVITY_END_TIME"]),
     )
+    if not available_slots:
+        logging.error(
+            "Could not find any available slot",
+            extra=dict(available_slots=available_slots),
+        )
+        return
 
     order_id: int | None = None
     for slot in available_slots:
@@ -48,5 +54,6 @@ def main():
             "Could not book any slot",
             extra=dict(available_slots=available_slots),
         )
+        return
 
     return order_id

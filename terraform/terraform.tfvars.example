@@ -1,0 +1,33 @@
+
+#--------------------------------------------------------------
+# Project specific
+#--------------------------------------------------------------
+
+project_name               = "book-better-bot"
+project_description        = "Bot to book activities at Better-owned leisure centres."
+better_venue_slug          = "leytonstone-leisure-centre"
+better_activity_slug       = "badminton-40min"
+better_activity_start_time = "2000"
+better_activity_end_time   = "2040"
+better_username            = 
+better_password            = 
+
+#--------------------------------------------------------------
+# AWS General
+#--------------------------------------------------------------
+
+aws_profile = "default"
+aws_region  = "eu-west-2"
+
+#--------------------------------------------------------------
+# AWS Lambda
+#--------------------------------------------------------------
+
+lambda_name    = "BookBetterBot"
+lambda_runtime = "python3.12"
+
+#--------------------------------------------------------------
+# AWS EventBridge Scheduler
+#--------------------------------------------------------------
+
+eventbridge_scheduler_schedule_expression = "cron(0 22 ? * 2 *)" # Every Monday at 10pm

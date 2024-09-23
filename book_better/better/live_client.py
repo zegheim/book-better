@@ -97,7 +97,7 @@ class LiveBetterClient:
         )
         response.raise_for_status()
 
-        available_slots = [
+        return [
             ActivitySlot(
                 id=slot["id"],
                 location_id=slot["location"]["id"],
@@ -111,10 +111,6 @@ class LiveBetterClient:
             and slot["booking"] is None
             and slot["benefit_available"] is not None
         ]
-        if not available_slots:
-            logging.warning("No available slots found")
-
-        return available_slots
 
     @_requires_authentication
     @log_method_inputs_and_outputs
@@ -127,7 +123,7 @@ class LiveBetterClient:
         )
         response.raise_for_status()
 
-        available_times = [
+        return [
             ActivityTime(
                 start=datetime.datetime.strptime(
                     time_["starts_at"]["format_24_hour"], "%H:%M"
@@ -139,10 +135,6 @@ class LiveBetterClient:
             for time_ in response.json()["data"]
             if time_["spaces"] > 0 and time_["booking"] is None
         ]
-        if not available_times:
-            logging.warning("No available times found")
-
-        return available_times
 
     @_requires_authentication
     @log_method_inputs_and_outputs

@@ -1,21 +1,14 @@
 import datetime
 import logging
 import os
-
-from dotenv import load_dotenv
+from typing import Any
 
 from book_better.better.live_client import LiveBetterClient
 from book_better.enums import BetterActivity, BetterVenue
 from book_better.utils import parse_time
 
-ACTIVITY_DATE = datetime.date(2024, 9, 27)
 
-logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()])
-
-load_dotenv()
-
-
-def main():
+def lambda_handler(event: Any, context: Any) -> int | None:
     client = LiveBetterClient(
         username=os.environ["BETTER_USERNAME"], password=os.environ["BETTER_PASSWORD"]
     )
@@ -23,7 +16,7 @@ def main():
     available_slots = client.get_available_slots_for(
         venue=BetterVenue(os.environ["BETTER_VENUE_SLUG"]),
         activity=BetterActivity(os.environ["BETTER_ACTIVITY_SLUG"]),
-        activity_date=ACTIVITY_DATE,
+        activity_date=datetime.date.today() + datetime.timedelta(days=7),
         start_time=parse_time(os.environ["BETTER_ACTIVITY_START_TIME"]),
         end_time=parse_time(os.environ["BETTER_ACTIVITY_END_TIME"]),
     )

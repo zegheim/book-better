@@ -41,6 +41,8 @@ resource "aws_lambda_function" "book_on_wednesday_1" {
 
   environment {
     variables = {
+      BETTER_BOOKING_HOUR_24H    = local.cron_booking_hour_24h
+      BETTER_BOOKING_TZ          = local.cron_schedule_tz
       BETTER_USERNAME            = var.slot_1.username
       BETTER_PASSWORD            = var.slot_1.password
       BETTER_ACTIVITY_SLUG       = var.activity_slugs.wednesday
@@ -95,6 +97,8 @@ resource "aws_lambda_function" "book_on_wednesday_2" {
 
   environment {
     variables = {
+      BETTER_BOOKING_HOUR_24H    = local.cron_booking_hour_24h
+      BETTER_BOOKING_TZ          = local.cron_schedule_tz
       BETTER_USERNAME            = var.slot_2.username
       BETTER_PASSWORD            = var.slot_2.password
       BETTER_ACTIVITY_SLUG       = var.activity_slugs.wednesday

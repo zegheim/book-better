@@ -5,6 +5,7 @@ from typing import Any, Literal, TypedDict
 
 from book_better.better.live_client import LiveBetterClient
 from book_better.enums import BetterActivity, BetterVenue
+from book_better.logging import log_function_inputs_and_outputs
 from book_better.utils import parse_time
 
 
@@ -13,6 +14,7 @@ class LambdaResponse(TypedDict):
     message: str
 
 
+@log_function_inputs_and_outputs
 def lambda_handler(event: Any, context: Any) -> LambdaResponse:
     client = LiveBetterClient(
         username=os.environ["BETTER_USERNAME"], password=os.environ["BETTER_PASSWORD"]

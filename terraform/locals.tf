@@ -9,15 +9,17 @@ locals {
 }
 
 
+
 locals {
+  cron_booking_hour_24h = "22"
   cron_schedules = {
-    monday    = "cron(0 22 ? * 2 *)"
-    tuesday   = "cron(0 22 ? * 3 *)"
-    wednesday = "cron(0 22 ? * 4 *)"
-    thursday  = "cron(0 22 ? * 5 *)"
-    friday    = "cron(0 22 ? * 6 *)"
-    saturday  = "cron(0 22 ? * 7 *)"
-    sunday    = "cron(0 22 ? * 1 *)"
+    monday    = "cron(59 ${local.cron_booking_hour_24h - 1} ? * 2 *)"
+    tuesday   = "cron(59 ${local.cron_booking_hour_24h - 1} ? * 3 *)"
+    wednesday = "cron(59 ${local.cron_booking_hour_24h - 1} ? * 4 *)"
+    thursday  = "cron(59 ${local.cron_booking_hour_24h - 1} ? * 5 *)"
+    friday    = "cron(59 ${local.cron_booking_hour_24h - 1} ? * 6 *)"
+    saturday  = "cron(59 ${local.cron_booking_hour_24h - 1} ? * 7 *)"
+    sunday    = "cron(59 ${local.cron_booking_hour_24h - 1} ? * 1 *)"
   }
   cron_schedule_tz = "Europe/London"
 }

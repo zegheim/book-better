@@ -12,6 +12,29 @@ def _hacky_sanitise(o: Any) -> Any:
     return json.loads(json.dumps(o, default=str))
 
 
+def log_function_inputs_and_outputs[**P, R](func: Callable[P, R]) -> Callable[P, R]:
+    @functools.wraps(func)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        func_name = func.__qualname__
+        logging.info(
+            f"{func_name}: input(s)",
+            extra=dict(
+                method_args=_hacky_sanitise(args),
+                method_kwargs=_hacky_sanitise(kwargs),
+            ),
+        )
+        result = func(*args, **kwargs)
+        logging.info(
+            f"{func_name}: output(s)",
+            extra=dict(
+                result=_hacky_sanitise(result),
+            ),
+        )
+        return result
+
+    return wrapper
+
+
 def log_method_inputs_and_outputs[**P, R](
     method: InstanceMethod[P, R],
 ) -> InstanceMethod[P, R]:

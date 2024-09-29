@@ -28,14 +28,14 @@ resource "null_resource" "build_layers" {
 data "archive_file" "lambda_zip" {
   type        = "zip"
   source_dir  = "../build_output/lambda"
-  output_path = "../build_output/${var.project_name}.zip"
+  output_path = "../build_output/${local.project_name}.zip"
   depends_on  = [null_resource.build_lambda]
 }
 
 data "archive_file" "layers_zip" {
   type        = "zip"
   source_dir  = "../build_output/layers"
-  output_path = "../build_output/${var.project_name}-dependencies.zip"
+  output_path = "../build_output/${local.project_name}-dependencies.zip"
   excludes    = ["__pycache__", "core/__pycache"]
   depends_on  = [null_resource.build_layers]
 }

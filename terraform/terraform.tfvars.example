@@ -1,33 +1,64 @@
+debug_mode = true
+activity_slugs = {
+  monday    = "badminton-40min"
+  tuesday   = "badminton-40min"
+  wednesday = "badminton-40min"
+  thursday  = "badminton-40min"
+  friday    = "badminton-40min"
+  saturday  = "badminton-40min"
+  sunday    = "badminton-40min"
+}
+venue_slugs = {
+  monday    = "leytonstone-leisure-centre"
+  tuesday   = "leytonstone-leisure-centre"
+  wednesday = "leytonstone-leisure-centre"
+  thursday  = "leytonstone-leisure-centre"
+  friday    = "leytonstone-leisure-centre"
+  saturday  = "leytonstone-leisure-centre"
+  sunday    = "leytonstone-leisure-centre"
+}
+slot_1 = {
+  username = ""
+  password = ""
+  start_times = {
+    monday    = "0940"
+    tuesday   = "0940"
+    wednesday = "0940"
+    thursday  = "0940"
+    friday    = "0940"
+    saturday  = "0940"
+    sunday    = "0940"
+  }
+  end_times = {
+    monday    = "1020"
+    tuesday   = "1020"
+    wednesday = "1020"
+    thursday  = "1020"
+    friday    = "1020"
+    saturday  = "1020"
+    sunday    = "1020"
+  }
+}
+slot_2 = {
+  username = ""
+  password = ""
+  start_times = {
+    monday    = "1020"
+    tuesday   = "1020"
+    wednesday = "1020"
+    thursday  = "1020"
+    friday    = "1020"
+    saturday  = "1020"
+    sunday    = "1020"
+  }
+  end_times = {
+    monday    = "1100"
+    tuesday   = "1100"
+    wednesday = "1100"
+    thursday  = "1100"
+    friday    = "1100"
+    saturday  = "1100"
+    sunday    = "1100"
+  }
+}
 
-#--------------------------------------------------------------
-# Project specific
-#--------------------------------------------------------------
-
-project_name               = "book-better-bot"
-project_description        = "Bot to book activities at Better-owned leisure centres."
-better_venue_slug          = "leytonstone-leisure-centre"
-better_activity_slug       = "badminton-40min"
-better_activity_start_time = "2000"
-better_activity_end_time   = "2040"
-better_username            = 
-better_password            = 
-
-#--------------------------------------------------------------
-# AWS General
-#--------------------------------------------------------------
-
-aws_profile = "default"
-aws_region  = "eu-west-2"
-
-#--------------------------------------------------------------
-# AWS Lambda
-#--------------------------------------------------------------
-
-lambda_name    = "BookBetterBot"
-lambda_runtime = "python3.12"
-
-#--------------------------------------------------------------
-# AWS EventBridge Scheduler
-#--------------------------------------------------------------
-
-eventbridge_scheduler_schedule_expression = "cron(0 22 ? * 2 *)" # Every Monday at 10pm

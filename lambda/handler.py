@@ -26,7 +26,7 @@ def _sleep_until(booking_time: datetime.time, tzinfo: datetime.tzinfo) -> None:
         tzinfo=tzinfo,
     )
     now_datetime = datetime.datetime.now(tz=tzinfo)
-    assert (booking_datetime - now_datetime).seconds <= MAX_WAIT_TIME_IN_SECS
+    assert (booking_datetime - now_datetime).total_seconds() <= MAX_WAIT_TIME_IN_SECS
 
     while datetime.datetime.now(tz=tzinfo).time() < booking_time:
         time.sleep(1.0)

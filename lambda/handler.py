@@ -59,7 +59,7 @@ def lambda_handler(event: Any, context: Any) -> LambdaResponse:
     if not available_slots:
         logging.error(
             "Could not find any available slot",
-            extra=dict(available_slots=available_slots),
+            extra=dict(activity_date=activity_date.strftime("%Y-%m-%d")),
         )
         return {
             "status": "error",
@@ -75,7 +75,11 @@ def lambda_handler(event: Any, context: Any) -> LambdaResponse:
             logging.error(
                 "Could not book slot, will try booking the next available slot",
                 exc_info=True,
-                extra=dict(slot=slot),
+                extra=dict(
+                    slot_id=slot.id,
+                    slot_location_id=slot.location_id,
+                    slot_name=slot.name,
+                ),
             )
             continue
         else:
@@ -84,12 +88,17 @@ def lambda_handler(event: Any, context: Any) -> LambdaResponse:
     if order_id is None:
         logging.error(
             "Could not book any slot",
-            extra=dict(available_slots=available_slots),
+            extra=dict(activity_date=activity_date.strftime("%Y-%m-%d")),
         )
         return {
             "status": "error",
             "message": f"Could not book any slot on {activity_date.strftime('%Y-%m-%d')}.",
         }
+
+    logging.info(
+        "Successfully booked slot.",
+        extra=dict(order_id=order_id),
+    )
 
     return {
         "status": "success",

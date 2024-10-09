@@ -7,7 +7,9 @@ from collections.abc import Callable
 from typing import Concatenate
 
 import requests
+from requests.adapters import HTTPAdapter
 from requests_toolbelt.sessions import BaseUrlSession  # type: ignore
+from urllib3.util import Retry
 
 from book_better.enums import BetterActivity, BetterVenue
 from book_better.logging import log_method_inputs_and_outputs
@@ -51,6 +53,16 @@ class LiveBetterClient:
             base_url="https://better-admin.org.uk/api/"
         )
         self.session.headers.update(self.HEADERS)
+        self.session.mount(
+            "https://",
+            HTTPAdapter(
+                max_retries=Retry(
+                    total=3,
+                    backoff_factor=2,
+                    status_forcelist=[429, 500, 502, 503, 504],
+                )
+            ),
+        )
 
     @property
     @log_method_inputs_and_outputs

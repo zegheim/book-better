@@ -25,26 +25,28 @@ locals {
 }
 
 locals {
-  slot_1 = {
-    lambda_names = {
-      monday    = "${local.lambda_name}-Monday-${var.slot_1.start_times.monday}-${var.slot_1.end_times.monday}"
-      tuesday   = "${local.lambda_name}-Tuesday-${var.slot_1.start_times.tuesday}-${var.slot_1.end_times.tuesday}"
-      wednesday = "${local.lambda_name}-Wednesday-${var.slot_1.start_times.wednesday}-${var.slot_1.end_times.wednesday}"
-      thursday  = "${local.lambda_name}-Thursday-${var.slot_1.start_times.thursday}-${var.slot_1.end_times.thursday}"
-      friday    = "${local.lambda_name}-Friday-${var.slot_1.start_times.friday}-${var.slot_1.end_times.friday}"
-      saturday  = "${local.lambda_name}-Saturday-${var.slot_1.start_times.saturday}-${var.slot_1.end_times.saturday}"
-      sunday    = "${local.lambda_name}-Sunday-${var.slot_1.start_times.sunday}-${var.slot_1.end_times.sunday}"
+  weekdays = [
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday",
+  ]
+
+  slot_day_map = merge([
+    for slot_name, slot in var.slots : {
+      for day in local.weekdays : "${slot_name}-${day}" => {
+        slot_name     = slot_name
+        day           = day
+        username      = slot.username
+        password      = slot.password
+        start_time    = slot.start_times[day]
+        end_time      = slot.end_times[day]
+        activity_slug = try(slot.activity_slugs[day], var.activity_slugs[day])
+        venue_slug    = try(slot.venue_slugs[day], var.venue_slugs[day])
+      }
     }
-  }
-  slot_2 = {
-    lambda_names = {
-      monday    = "${local.lambda_name}-Monday-${var.slot_2.start_times.monday}-${var.slot_2.end_times.monday}"
-      tuesday   = "${local.lambda_name}-Tuesday-${var.slot_2.start_times.tuesday}-${var.slot_2.end_times.tuesday}"
-      wednesday = "${local.lambda_name}-Wednesday-${var.slot_2.start_times.wednesday}-${var.slot_2.end_times.wednesday}"
-      thursday  = "${local.lambda_name}-Thursday-${var.slot_2.start_times.thursday}-${var.slot_2.end_times.thursday}"
-      friday    = "${local.lambda_name}-Friday-${var.slot_2.start_times.friday}-${var.slot_2.end_times.friday}"
-      saturday  = "${local.lambda_name}-Saturday-${var.slot_2.start_times.saturday}-${var.slot_2.end_times.saturday}"
-      sunday    = "${local.lambda_name}-Sunday-${var.slot_2.start_times.sunday}-${var.slot_2.end_times.sunday}"
-    }
-  }
+  ]...)
 }

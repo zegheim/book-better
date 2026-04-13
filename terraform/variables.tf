@@ -32,28 +32,12 @@ variable "venue_slugs" {
 }
 
 variable "slots" {
-  description = "Map of slot configurations. Each slot gets username/password and weekday start/end times."
+  description = "Map of slot configurations. Each slot gets username/password and optional per-day start/end times."
   type = map(object({
-    username = string
-    password = string
-    start_times = object({
-      monday    = string
-      tuesday   = string
-      wednesday = string
-      thursday  = string
-      friday    = string
-      saturday  = string
-      sunday    = string
-    })
-    end_times = object({
-      monday    = string
-      tuesday   = string
-      wednesday = string
-      thursday  = string
-      friday    = string
-      saturday  = string
-      sunday    = string
-    })
+    username    = string
+    password    = string
+    start_times = optional(map(string))  # e.g., { tuesday = "1020", friday = "0940" }
+    end_times   = optional(map(string))  # e.g., { tuesday = "1100", friday = "1020" }
   }))
   sensitive = true
 }

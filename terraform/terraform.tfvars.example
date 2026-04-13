@@ -21,6 +21,7 @@ slots = {
   slot_1 = {
     username = ""
     password = ""
+    # Specify all days
     start_times = {
       monday    = "0940"
       tuesday   = "0940"
@@ -43,6 +44,7 @@ slots = {
   slot_2 = {
     username = ""
     password = ""
+    # Specify all days
     start_times = {
       monday    = "1020"
       tuesday   = "1020"
@@ -60,6 +62,19 @@ slots = {
       friday    = "1100"
       saturday  = "1100"
       sunday    = "1100"
+    }
+  }
+  # Example: slot for only Tuesday and Thursday
+  slot_3 = {
+    username = ""
+    password = ""
+    start_times = {
+      tuesday   = "1900"
+      thursday  = "1900"
+    }
+    end_times = {
+      tuesday   = "2000"
+      thursday  = "2000"
     }
   }
 }

@@ -15,4 +15,4 @@ fi
 
 mkdir -p "$LAYERS_DIR"
 poetry export --output="$REQUIREMENTS_FILE"
-pip install --quiet -r "$REQUIREMENTS_FILE" -t "$LAYERS_DIR/python/lib/python3.12/site-packages/"
+pip3.12 install --quiet -r "$REQUIREMENTS_FILE" -t "$LAYERS_DIR/python/lib/python3.12/site-packages/"

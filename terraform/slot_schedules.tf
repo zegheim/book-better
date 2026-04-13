@@ -1,7 +1,7 @@
 resource "aws_lambda_function" "booking_lambda" {
-  for_each = local.slot_day_map
+  for_each = local.slot_day_keys
 
-  function_name    = "${local.lambda_name}-${each.value.slot_name}-${each.value.day}-${each.value.start_time}-${each.value.end_time}"
+  function_name    = "${local.lambda_name}-${title(each.value.day)}-${each.value.start_time}-${each.value.end_time}"
   description      = local.project_description
   filename         = data.archive_file.lambda_zip.output_path
   runtime          = local.lambda_runtime
@@ -25,8 +25,8 @@ resource "aws_lambda_function" "booking_lambda" {
     variables = {
       BETTER_BOOKING_HOUR_24H    = local.cron_booking_hour_24h
       BETTER_BOOKING_TZ          = local.cron_schedule_tz
-      BETTER_USERNAME            = each.value.username
-      BETTER_PASSWORD            = each.value.password
+      BETTER_USERNAME            = var.slots[each.value.slot_name].username
+      BETTER_PASSWORD            = var.slots[each.value.slot_name].password
       BETTER_ACTIVITY_SLUG       = each.value.activity_slug
       BETTER_ACTIVITY_START_TIME = each.value.start_time
       BETTER_ACTIVITY_END_TIME   = each.value.end_time
@@ -37,7 +37,7 @@ resource "aws_lambda_function" "booking_lambda" {
 }
 
 resource "aws_scheduler_schedule" "booking_schedule" {
-  for_each = local.slot_day_map
+  for_each = local.slot_day_keys
 
   name = aws_lambda_function.booking_lambda[each.key].function_name
 

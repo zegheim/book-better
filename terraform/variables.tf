@@ -36,8 +36,7 @@ variable "slots" {
   type = map(object({
     username    = string
     password    = string
-    start_times = optional(map(string))  # e.g., { tuesday = "1020", friday = "0940" }
-    end_times   = optional(map(string))  # e.g., { tuesday = "1100", friday = "1020" }
+    start_times = optional(map(string)) # e.g., { tuesday = "1020", friday = "0940" }
+    end_times   = optional(map(string)) # e.g., { tuesday = "1100", friday = "1020" }
   }))
-  sensitive = true
 }

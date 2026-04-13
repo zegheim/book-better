@@ -35,13 +35,12 @@ locals {
     "sunday",
   ]
 
-  slot_day_map = merge([
+  # Non-sensitive map for for_each iteration (excludes username/password)
+  slot_day_keys = merge([
     for slot_name, slot in var.slots : {
       for day in local.days_of_the_week : "${slot_name}-${day}" => {
         slot_name     = slot_name
         day           = day
-        username      = slot.username
-        password      = slot.password
         start_time    = slot.start_times[day]
         end_time      = slot.end_times[day]
         activity_slug = var.activity_slugs[day]
@@ -49,8 +48,8 @@ locals {
       }
       # Only create a slot/day pair if both start_times and end_times are specified for this day
       if slot.start_times != null && slot.end_times != null &&
-         contains(keys(slot.start_times), day) &&
-         contains(keys(slot.end_times), day)
+      contains(keys(slot.start_times), day) &&
+      contains(keys(slot.end_times), day)
     }
   ]...)
 }

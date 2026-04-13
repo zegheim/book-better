@@ -25,7 +25,7 @@ locals {
 }
 
 locals {
-  weekdays = [
+  days_of_the_week = [
     "monday",
     "tuesday",
     "wednesday",
@@ -37,15 +37,15 @@ locals {
 
   slot_day_map = merge([
     for slot_name, slot in var.slots : {
-      for day in local.weekdays : "${slot_name}-${day}" => {
+      for day in local.days_of_the_week : "${slot_name}-${day}" => {
         slot_name     = slot_name
         day           = day
         username      = slot.username
         password      = slot.password
         start_time    = slot.start_times[day]
         end_time      = slot.end_times[day]
-        activity_slug = try(slot.activity_slugs[day], var.activity_slugs[day])
-        venue_slug    = try(slot.venue_slugs[day], var.venue_slugs[day])
+        activity_slug = var.activity_slugs[day]
+        venue_slug    = var.venue_slugs[day]
       }
     }
   ]...)

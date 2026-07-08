@@ -8,7 +8,7 @@ from book_better.better.live_client import LiveBetterClient
 from book_better.enums import BetterActivity, BetterVenue
 from book_better.utils import parse_time
 
-ACTIVITY_DATE = datetime.date(2024, 9, 27)
+ACTIVITY_DATE = datetime.date(2026, 7, 13)
 
 logging.basicConfig(level=logging.DEBUG, handlers=[logging.StreamHandler()])
 
@@ -16,6 +16,7 @@ load_dotenv()
 
 
 def main():
+    print("hello")
     client = LiveBetterClient(
         username=os.environ["BETTER_USERNAME"], password=os.environ["BETTER_PASSWORD"]
     )
@@ -57,3 +58,6 @@ def main():
         return
 
     return order_id
+
+if __name__ == "__main__":
+    main()

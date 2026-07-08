@@ -12,12 +12,9 @@ from requests_toolbelt.sessions import BaseUrlSession  # type: ignore
 from urllib3.util import Retry
 
 from book_better.enums import BetterActivity, BetterVenue
-from book_better.logging import log_method_inputs_and_outputs
-from book_better.models import (
-    ActivityCart,
-    ActivitySlot,
-    ActivityTime,
-)
+from book_better.models import ActivityCart, ActivitySlot, ActivityTime
+
+from book_better.utils import log_method_inputs_and_outputs
 
 type _LiveBetterClientInstanceMethod[**P, R] = Callable[
     Concatenate[LiveBetterClient, P], R

@@ -8,8 +8,7 @@ import zoneinfo
 
 from book_better.better.live_client import LiveBetterClient
 from book_better.enums import BetterActivity, BetterVenue
-from book_better.logging import log_function_inputs_and_outputs
-from book_better.utils import parse_time
+from book_better.utils import log_function_inputs_and_outputs, parse_time
 
 MAX_WAIT_TIME_IN_SECS = 2 * 60
 

@@ -125,8 +125,6 @@ slots = {
 ### Notes
 
 - Activity and venue slugs are shared across all slots (see `activity_slugs` and `venue_slugs` above).
-- Each slot uses separate AWS Lambda credentials; they run independently.
-- Adding a new slot is as simple as adding another key-value pair to the `slots` map—no code changes required.
 
 # Developing locally
 

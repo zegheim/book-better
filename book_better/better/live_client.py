@@ -12,12 +12,9 @@ from requests_toolbelt.sessions import BaseUrlSession  # type: ignore
 from urllib3.util import Retry
 
 from book_better.enums import BetterActivity, BetterVenue
-from book_better.logging import log_method_inputs_and_outputs
-from book_better.models import (
-    ActivityCart,
-    ActivitySlot,
-    ActivityTime,
-)
+from book_better.models import ActivityCart, ActivitySlot, ActivityTime
+
+from book_better.utils import log_method_inputs_and_outputs
 
 type _LiveBetterClientInstanceMethod[**P, R] = Callable[
     Concatenate[LiveBetterClient, P], R
@@ -99,15 +96,31 @@ class LiveBetterClient:
         start_time: datetime.time,
         end_time: datetime.time,
     ) -> list[ActivitySlot]:
-        response = self.session.get(
-            f"activities/venue/{venue.value}/activity/{activity.value}/slots",
+        times = self.session.get(
+            f"activities/venue/{venue.value}/activity/{activity.value}/v2/times",
+            params={"date": activity_date.strftime("%Y-%m-%d")},
+        )
+        times.raise_for_status()
+
+        composite_key = next(
+            time["composite_key"]
+            for time in times.json()["data"]
+            if time["starts_at"]["format_24_hour"] == start_time.strftime("%H:%M")
+            and time["ends_at"]["format_24_hour"] == end_time.strftime("%H:%M")
+            and time["spaces"] > 0
+            and time["booking"] is None
+        )
+
+        slots = self.session.get(
+            f"activities/venue/{venue.value}/activity/{activity.value}/v2/slots",
             params={
                 "date": activity_date.strftime("%Y-%m-%d"),
                 "start_time": start_time.strftime("%H:%M"),
                 "end_time": end_time.strftime("%H:%M"),
+                "composite_key": composite_key,
             },
         )
-        response.raise_for_status()
+        slots.raise_for_status()
 
         return [
             ActivitySlot(
@@ -118,7 +131,7 @@ class LiveBetterClient:
                 name=slot["location"]["slug"],
                 cart_type=slot["cart_type"],
             )
-            for slot in response.json()["data"]
+            for slot in slots.json()["data"]
             if slot["spaces"] > 0
             and slot["booking"] is None
             and slot["benefit_available"] is not None
